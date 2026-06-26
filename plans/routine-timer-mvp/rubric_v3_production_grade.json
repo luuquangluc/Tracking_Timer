@@ -1,0 +1,98 @@
+{
+  "locked": true,
+  "target": 9,
+  "target_min": 7,
+  "criteria": [
+    {
+      "name": "feature_correctness",
+      "weight": 0.18,
+      "threshold": 9,
+      "description": "All core product requirements work as specified, including routine CRUD, step CRUD, timer execution, automatic step transitions, streak tracking, XP calculation, level progression, achievements, analytics, and visual progression."
+    },
+    {
+      "name": "timer_engine_accuracy",
+      "weight": 0.12,
+      "threshold": 9,
+      "description": "Timer remains accurate across long sessions, pause/resume cycles, backgrounding, browser tab inactivity, reloads, and step transitions. Auto-advance behavior is reliable and free of timing drift."
+    },
+    {
+      "name": "routine_step_crud_ux",
+      "weight": 0.10,
+      "threshold": 9,
+      "description": "Users can create, edit, delete, duplicate, reorder, and manage routines and steps directly from the dashboard with minimal friction. Mobile-friendly duration inputs and intuitive interactions are provided."
+    },
+    {
+      "name": "gamification_design",
+      "weight": 0.08,
+      "threshold": 8,
+      "description": "XP, levels, streaks, best streak tracking, achievements, and visual progression form a compelling reward loop that encourages repeat usage without overwhelming the user."
+    },
+    {
+      "name": "analytics_dashboard",
+      "weight": 0.08,
+      "threshold": 8,
+      "description": "Dashboard clearly presents current streak, best streak, XP progress, completed routines, total focus time, achievement progress, and weekly completion analytics with low cognitive load."
+    },
+    {
+      "name": "mobile_first_ux",
+      "weight": 0.10,
+      "threshold": 9,
+      "description": "UI follows mobile-first principles. Touch targets are at least 44x44px, controls are thumb-zone optimized, spacing prevents accidental taps, and core actions are reachable with one hand."
+    },
+    {
+      "name": "accessibility",
+      "weight": 0.08,
+      "threshold": 9,
+      "description": "WCAG AA contrast standards are met. Interface supports keyboard navigation, semantic HTML, screen readers, visible focus states, scalable text, and color-independent status indicators."
+    },
+    {
+      "name": "responsive_design",
+      "weight": 0.06,
+      "threshold": 9,
+      "description": "Layouts adapt correctly across phones, tablets, and desktop widths without overlap, clipping, horizontal scrolling, broken navigation, or unreadable content."
+    },
+    {
+      "name": "performance",
+      "weight": 0.06,
+      "threshold": 9,
+      "description": "Application loads quickly, maintains smooth animations, minimizes layout shift, avoids unnecessary rendering, and provides responsive interactions under normal usage."
+    },
+    {
+      "name": "state_management_persistence",
+      "weight": 0.06,
+      "threshold": 9,
+      "description": "Application state persists correctly using localStorage. XP, streaks, achievements, analytics, and visual progression are restored accurately after refreshes or browser restarts."
+    },
+    {
+      "name": "technical_reliability",
+      "weight": 0.04,
+      "threshold": 9,
+      "description": "Application handles unexpected failures gracefully, validates user input, prevents crashes, and provides meaningful recovery paths when storage or runtime errors occur."
+    },
+    {
+      "name": "edge_cases",
+      "weight": 0.06,
+      "threshold": 9,
+      "description": "Handles empty routines, zero-duration steps, invalid durations, duplicate names, deleted active routines, reset confirmation flows, interrupted sessions, corrupted localStorage, and first-run scenarios."
+    },
+    {
+      "name": "interaction_polish",
+      "weight": 0.04,
+      "threshold": 8,
+      "description": "Micro-interactions, progress animations, achievement unlocks, XP gains, transitions, loading states, and error messages feel polished, consistent, and purposeful."
+    },
+    {
+      "name": "visual_hierarchy",
+      "weight": 0.02,
+      "threshold": 8,
+      "description": "Information architecture is clear. Timer remains the primary visual anchor, progress indicators are distinguishable, and users can quickly understand current status and next actions."
+    },
+    {
+      "name": "code_quality_architecture",
+      "weight": 0.02,
+      "threshold": 8,
+      "description": "Code is modular, maintainable, reusable, documented where necessary, and follows clear separation of concerns without excessive duplication."
+    }
+  ],
+  "orchestration_mode": "Local controller"
+}

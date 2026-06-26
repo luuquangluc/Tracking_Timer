@@ -1,0 +1,22 @@
+{
+  "iteration": 2,
+  "target": 9.5,
+  "fixes": [
+    "Added safeGetItem, safeSetItem, and safeRemoveItem wrappers for localStorage failure modes.",
+    "Normalized timer progress by elapsed routine time so large reload/sleep deltas cross multiple steps and complete correctly.",
+    "Added progressbar ARIA semantics.",
+    "Added dialog aria-labelledby and aria-describedby.",
+    "Added ScrollArea primitive and used it in the routine editor.",
+    "Fixed mobile sticky action label to show Resume when paused.",
+    "Removed secondary blue #2997ff and unified selected state on primary #0066cc.",
+    "Softened card borders and removed the white rounded hero timer card wrapper.",
+    "Added components.json and serve:dist script, and updated README for Vite React."
+  ],
+  "verification": [
+    "npm run build passed.",
+    "Browser smoke found no console errors and no horizontal overflow.",
+    "Progress bars expose aria-valuenow and aria-valuemax.",
+    "Dialog exposes aria-labelledby and aria-describedby.",
+    "Mobile sticky button shows Resume when paused and remains 44px high."
+  ]
+}

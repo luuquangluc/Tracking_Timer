@@ -1,0 +1,32 @@
+{
+  "locked": true,
+  "target": 9,
+  "target_min": 7,
+  "criteria": [
+    {
+      "name": "correctness",
+      "weight": 0.3,
+      "threshold": 9,
+      "description": "Routine CRUD, timer sequencing, persistence, streak, XP, and achievement rules work as specified."
+    },
+    {
+      "name": "completeness",
+      "weight": 0.25,
+      "threshold": 9,
+      "description": "MVP includes timer engine, streaks, XP/level, dashboard, achievements, and visual progression."
+    },
+    {
+      "name": "edge_cases",
+      "weight": 0.2,
+      "threshold": 8,
+      "description": "Handles empty routines, zero/invalid durations, pause/reset/skip, deleting selected routines, and first-run data."
+    },
+    {
+      "name": "craft",
+      "weight": 0.25,
+      "threshold": 9,
+      "description": "UX feels like a real app, is responsive, readable, and avoids overlap or decorative clutter."
+    }
+  ],
+  "orchestration_mode": "Local controller"
+}

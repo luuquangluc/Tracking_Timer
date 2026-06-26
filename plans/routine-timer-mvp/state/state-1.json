@@ -1,0 +1,7 @@
+{
+  "prior_scores": null,
+  "failure_class": null,
+  "targeted_criteria": [],
+  "hypothesis": "First integrated MVP meets target after browser interaction checks.",
+  "what_not_to_retry": []
+}

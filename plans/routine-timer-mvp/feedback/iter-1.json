@@ -1,0 +1,19 @@
+{
+  "iteration": 1,
+  "scores": {
+    "correctness": 9,
+    "completeness": 9,
+    "edge_cases": 9,
+    "craft": 9
+  },
+  "evidence": [
+    "node --check app.js passed.",
+    "Browser load via http://127.0.0.1:8765 showed title Routine Grove, one seeded routine, four seeded steps, timer 07:00, and no console errors.",
+    "Timer controls verified: Start changed status to In progress and time to 06:59, Pause changed button to Resume, Reset restored 07:00 Ready state.",
+    "Routine editor verified by creating Evening Reset; routine count updated to 2 and selected routine changed.",
+    "Completion reward loop verified with a 1-second routine: completed count 1, current streak 1d, 10 XP, First Step achievement, and 1 garden tree.",
+    "Mobile viewport 390x844 verified no horizontal overflow and timer actions stacked into one column.",
+    "ID generation includes a crypto.randomUUID fallback so direct file opening remains robust."
+  ],
+  "notes": "Screenshot capture timed out in the browser runtime, so final scoring uses DOM metrics, console logs, and interaction checks."
+}

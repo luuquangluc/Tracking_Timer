@@ -1,0 +1,44 @@
+{
+  "locked": true,
+  "target": 9.5,
+  "target_min": 7,
+  "criteria": [
+    {
+      "name": "routine_step_crud_ux",
+      "weight": 0.2,
+      "threshold": 9,
+      "description": "Users can create, edit, delete, reorder, and manage routines and steps directly from the dashboard without navigation friction. Supports step name, duration, type (activity/rest), mobile-friendly inputs, and smooth interactions."
+    },
+    {
+      "name": "timer_engine_progress",
+      "weight": 0.25,
+      "threshold": 9,
+      "description": "Timer runs accurately, supports start, pause, resume, skip, and reset actions, automatically advances between steps, and clearly displays dual progress (current step and overall routine progress)."
+    },
+    {
+      "name": "gamification_reward_loop",
+      "weight": 0.2,
+      "threshold": 8,
+      "description": "XP, level progression, streaks, best streak tracking, achievements, and visual progression are correctly calculated and updated immediately upon routine completion."
+    },
+    {
+      "name": "analytics_achievements",
+      "weight": 0.15,
+      "threshold": 8,
+      "description": "Dashboard provides clear weekly analytics, completion history, XP status, streak metrics, achievement unlock states, and meaningful progress visualization."
+    },
+    {
+      "name": "technical_reliability",
+      "weight": 0.1,
+      "threshold": 9,
+      "description": "Application persists data reliably using localStorage, survives reloads, restores state correctly, handles storage migration/versioning, and prevents data loss."
+    },
+    {
+      "name": "mobile_first_ux",
+      "weight": 0.1,
+      "threshold": 9,
+      "description": "Touch targets meet mobile accessibility standards, controls are thumb-zone optimized, typography is readable, contrast is accessible, interactions are responsive, and layouts remain stable without CLS issues."
+    }
+  ],
+  "orchestration_mode": "Local controller implementation with multi-agent evaluation"
+}

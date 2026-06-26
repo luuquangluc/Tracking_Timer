@@ -1,0 +1,17 @@
+{
+  "iteration": 3,
+  "scores": {
+    "mobile_first_ux": 9.1,
+    "visual_craft_layout": 9.0
+  },
+  "evidence": [
+    "node --check app.js exited 0.",
+    "Browser desktop smoke: no console errors, no horizontal overflow, no mojibake, achievement labels render with ASCII separators, history panel exists, primary button min-height is 44px.",
+    "Browser mobile smoke at 390x844: no horizontal overflow, timer actions are sticky at bottom 10px, primary button min-height is 44px.",
+    "Dialog smoke at 390x844: editor rows stack to one column, form overflow is auto, activity/rest options exist, move/remove/close labels are clear."
+  ],
+  "remaining_risk": [
+    "No automated visual regression suite exists for this static app.",
+    "Target 9.5 remains aspirational without a full rubric evaluator that runs all interactions from a clean browser profile."
+  ]
+}

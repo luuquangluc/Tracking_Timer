@@ -1,0 +1,37 @@
+{
+  "iteration": "lighthouse-optimization-iter-1",
+  "source_report": "D:/luc/Luc_Lenovo/Study/Tracking_Timer/eval_ui.json",
+  "target": 9.5,
+  "scores": {
+    "accessibility_remediation": 9.7,
+    "seo_remediation": 9.6,
+    "static_delivery_remediation": 9.5,
+    "regression_coverage": 9.5
+  },
+  "evidence": {
+    "accessibility_remediation": [
+      "src/components/ui/progress.jsx now supplies a fallback aria-label when no explicit label is provided.",
+      "src/App.jsx now passes contextual aria-label values for timer, level, and achievement progressbars."
+    ],
+    "seo_remediation": [
+      "index.html now includes a meta description for Routine Grove.",
+      "public/robots.txt is valid and copied into dist by the production build."
+    ],
+    "static_delivery_remediation": [
+      "scripts/static-server.cjs serves .txt as text/plain.",
+      "Hashed dist assets are served with public, max-age=31536000, immutable.",
+      "Missing asset-like paths return 404 instead of falling back to index.html."
+    ],
+    "regression_coverage": [
+      "scripts/production-smoke.mjs now checks accessible progressbar fallback, SEO metadata, robots.txt, cache headers, and 404 fallback behavior.",
+      "npm.cmd run lint passed.",
+      "npm.cmd run build passed.",
+      "npm.cmd run smoke passed 18/18."
+    ]
+  },
+  "remaining_risks": [
+    "The original Lighthouse report had PROTOCOL_TIMEOUT on FullPageScreenshot and a Chrome extension performance warning; rerun Lighthouse in a clean profile to confirm updated category scores.",
+    "Performance 66 in the baseline may require a clean Lighthouse rerun before deeper JavaScript splitting decisions are justified."
+  ],
+  "failure_class": null
+}

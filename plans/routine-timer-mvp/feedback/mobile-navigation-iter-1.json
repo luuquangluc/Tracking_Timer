@@ -1,0 +1,19 @@
+{
+  "iteration": "mobile-navigation-iter-1",
+  "target": 9.5,
+  "problem": "Mobile UX felt like a single long scrolling page, making the core flow harder to navigate.",
+  "fixes": [
+    "Added mobile-only app shell with bottom tabs: Timer, Routines, Progress, Awards.",
+    "Kept desktop full-page Apple-style layout unchanged.",
+    "Moved mobile timer action bar above the section tab bar.",
+    "Selecting a routine returns mobile users to the Timer view.",
+    "Adjusted mobile tile sizing and bottom padding so each view feels like a focused screen."
+  ],
+  "verification_plan": [
+    "Build the app.",
+    "Browser smoke mobile 390x844 to verify only one mobile view is visible at a time.",
+    "Verify bottom nav buttons are 52px touch targets.",
+    "Verify tab switching changes visible content without horizontal overflow.",
+    "Verify timer sticky controls do not overlap bottom tab bar."
+  ]
+}
