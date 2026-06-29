@@ -2,7 +2,9 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   BarChart3,
   Check,
+  ChevronDown,
   Clock3,
+  Copy,
   Flame,
   Leaf,
   ListChecks,
@@ -57,23 +59,41 @@ const legacyAchievementLabels = {
   "cao-thu": "grove-master",
 };
 
+const chimeOptions = [
+  { id: "beep", label: "Beep" },
+  { id: "beep-2", label: "Beep x2" },
+  { id: "beep-3", label: "Beep x3" },
+  { id: "bell", label: "Bell" },
+  { id: "bell-2", label: "Bell x2" },
+  { id: "bell-3", label: "Bell x3" },
+  { id: "gong", label: "Gong" },
+  { id: "gong-2", label: "Gong x2" },
+  { id: "gong-3", label: "Gong x3" },
+  { id: "soft", label: "Soft" },
+  { id: "soft-2", label: "Soft x2" },
+  { id: "soft-3", label: "Soft x3" },
+  { id: "none", label: "None" },
+];
+
+const validChimes = chimeOptions.map((option) => option.id);
+
 function makeId() {
   if (globalThis.crypto?.randomUUID) return globalThis.crypto.randomUUID();
   return `id-${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
 }
 
-function createStep(name = "Focus Block", minutes = 5, seconds = 0, type = "activity") {
-  return { id: makeId(), name, minutes, seconds, type };
+function createStep(name = "Focus Block", minutes = 5, seconds = 0, type = "activity", chime = "beep") {
+  return { id: makeId(), name, minutes, seconds, type, chime };
 }
 
 function createDefaultRoutineDraft() {
   return {
     name: "New Routine",
     steps: [
-      createStep("Prepare", 0, 5, "prepare"),
-      createStep("Work", 1, 0, "activity"),
-      createStep("Rest", 0, 30, "rest"),
-      createStep("Finish", 0, 3, "finish"),
+      createStep("Prepare", 0, 5, "prepare", "bell"),
+      createStep("Work", 1, 0, "activity", "beep"),
+      createStep("Rest", 0, 30, "rest", "soft"),
+      createStep("Finish", 0, 3, "finish", "gong"),
     ],
   };
 }
@@ -203,35 +223,53 @@ function unlockTimerAudio() {
   if (context?.state === "suspended") context.resume().catch(() => {});
 }
 
-function playTimerChime(kind = "step") {
+function playTimerChime(kind = "beep") {
+  if (kind === "none") return;
   const context = getTimerAudioContext();
   if (!context) return;
   if (context.state === "suspended") context.resume().catch(() => {});
 
   const now = context.currentTime;
-  const notes = kind === "complete"
-    ? [
-        { frequency: 660, start: 0, duration: 0.13 },
-        { frequency: 880, start: 0.15, duration: 0.18 },
-      ]
-    : [{ frequency: 740, start: 0, duration: 0.16 }];
+  const [, baseKind = kind, repeatPart] = String(kind).match(/^([a-z]+)(?:-(\d+))?$/) || [];
+  const repeatCount = Math.max(1, Math.min(3, Number(repeatPart) || 1));
+  const presets = {
+    beep: [{ frequency: 740, start: 0, duration: 0.16, type: "sine", gain: 0.16 }],
+    bell: [
+      { frequency: 880, start: 0, duration: 0.18, type: "triangle", gain: 0.14 },
+      { frequency: 1320, start: 0.04, duration: 0.2, type: "sine", gain: 0.08 },
+    ],
+    gong: [
+      { frequency: 220, start: 0, duration: 0.45, type: "sine", gain: 0.18 },
+      { frequency: 330, start: 0.03, duration: 0.38, type: "triangle", gain: 0.1 },
+    ],
+    soft: [{ frequency: 523, start: 0, duration: 0.22, type: "sine", gain: 0.09 }],
+    complete: [
+      { frequency: 660, start: 0, duration: 0.13, type: "sine", gain: 0.16 },
+      { frequency: 880, start: 0.15, duration: 0.18, type: "sine", gain: 0.16 },
+    ],
+  };
+  const notes = presets[baseKind] || presets.beep;
+  const repeatGap = baseKind === "gong" ? 0.55 : 0.28;
 
-  notes.forEach(({ frequency, start, duration }) => {
-    const oscillator = context.createOscillator();
-    const gain = context.createGain();
-    oscillator.type = "sine";
-    oscillator.frequency.setValueAtTime(frequency, now + start);
-    gain.gain.setValueAtTime(0.0001, now + start);
-    gain.gain.exponentialRampToValueAtTime(0.16, now + start + 0.015);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + start + duration);
-    oscillator.connect(gain);
-    gain.connect(context.destination);
-    oscillator.start(now + start);
-    oscillator.stop(now + start + duration + 0.03);
-  });
+  for (let repeatIndex = 0; repeatIndex < repeatCount; repeatIndex += 1) {
+    const offset = repeatIndex * repeatGap;
+    notes.forEach(({ frequency, start, duration, type, gain: peakGain }) => {
+      const oscillator = context.createOscillator();
+      const gain = context.createGain();
+      oscillator.type = type;
+      oscillator.frequency.setValueAtTime(frequency, now + offset + start);
+      gain.gain.setValueAtTime(0.0001, now + offset + start);
+      gain.gain.exponentialRampToValueAtTime(peakGain, now + offset + start + 0.015);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + offset + start + duration);
+      oscillator.connect(gain);
+      gain.connect(context.destination);
+      oscillator.start(now + offset + start);
+      oscillator.stop(now + offset + start + duration + 0.03);
+    });
+  }
 
-  if (kind === "step") navigator.vibrate?.(80);
-  else navigator.vibrate?.([80, 40, 120]);
+  if (baseKind === "gong" || baseKind === "complete") navigator.vibrate?.([80, 40, 120]);
+  else navigator.vibrate?.(80);
 }
 
 function dateKey(date = new Date()) {
@@ -278,7 +316,8 @@ function migrateState(parsed) {
           name: step.name || "Untitled Step",
           minutes: Math.max(0, Number(step.minutes) || 0),
           seconds: Math.min(59, Math.max(0, Number(step.seconds) || 0)),
-          type: ["activity", "rest", "meditation", "yoga", "study", "custom"].includes(step.type) ? step.type : "activity",
+          type: ["prepare", "activity", "rest", "finish", "meditation", "yoga", "study", "custom"].includes(step.type) ? step.type : "activity",
+          chime: validChimes.includes(step.chime) ? step.chime : "beep",
         }))
       : [],
   }));
@@ -452,8 +491,9 @@ function App() {
           if (normalized.completed) {
             window.setTimeout(() => completeRoutine(routine, { chime: true }), 0);
           } else if (normalized.timer.stepIndex !== current.stepIndex) {
-            playTimerChime("step");
-            setToast(`Next: ${routine.steps[normalized.timer.stepIndex].name}`);
+            const nextTimedStep = routine.steps[normalized.timer.stepIndex];
+            playTimerChime(nextTimedStep?.chime || "beep");
+            setToast(`Next: ${nextTimedStep.name}`);
           }
           return normalized.timer;
         }
@@ -543,10 +583,10 @@ function App() {
     setTimer(createIdleTimer(activeRoutine?.id));
   }
 
-  function selectRoutine(id) {
+  function selectRoutine(id, options = {}) {
     setState((current) => ({ ...current, selectedRoutineId: id }));
     setTimer(readTimerState(id));
-    setActiveMobileView("timer");
+    if (options.openTimer !== false) setActiveMobileView("timer");
   }
 
   function selectAdjacentRoutine(direction) {
@@ -598,6 +638,7 @@ function App() {
         name: item.name.trim() || "Untitled Step",
         minutes: Math.max(0, Number(item.minutes) || 0),
         seconds: Math.min(59, Math.max(0, Number(item.seconds) || 0)),
+        chime: validChimes.includes(item.chime) ? item.chime : "beep",
       }))
       .filter((item) => rawDurationSeconds(item) > 0);
     if (!steps.length) {
@@ -702,6 +743,7 @@ function App() {
             week={week}
             maxWeek={maxWeek}
             history={history}
+            selectRoutine={selectRoutine}
           />
         </MobileViewPane>
         <MobileViewPane id="awards" active={activeMobileView === "awards"}>
@@ -1118,40 +1160,47 @@ function RoutineGallery({ routines, selectedId, selectRoutine, duplicateRoutine,
   return (
     <section id="routines" className="tile-compact bg-foreground text-background">
       <div className="mx-auto max-w-[1440px]">
-        <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
-          <div>
-            <h2 className="apple-tight text-[40px] font-semibold leading-tight">Pick the next session.</h2>
-            <p className="mt-2 text-[17px] text-background/70">The routine list is the product shelf: quiet, direct, and ready to run.</p>
-          </div>
-          <Button onClick={() => openEditor()}><Plus className="h-4 w-4" />New routine</Button>
-        </div>
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
           {routines.map((routine) => (
             <div
               key={routine.id}
               className={cn(
-                "rounded-lg border p-6 text-left transition active:scale-[0.98]",
+                "relative rounded-lg border p-6 text-left transition active:scale-[0.98]",
                 selectedId === routine.id ? "border-primary bg-background text-foreground" : "border-background/10 bg-background/10 text-background",
               )}
             >
-              <button className="w-full text-left" onClick={() => selectRoutine(routine.id)} type="button">
-                <div className="flex items-start justify-between gap-4">
-                  <h3 className="text-[21px] font-semibold tracking-[-0.2px]">{routine.name}</h3>
-                  {selectedId === routine.id ? <Check className="h-5 w-5 text-primary" /> : null}
+              <div className="absolute right-4 top-4 flex gap-2">
+                <button
+                  className={cn(
+                    "inline-flex h-9 w-9 items-center justify-center rounded-full border transition active:scale-95",
+                    selectedId === routine.id ? "border-border bg-surface-muted text-foreground" : "border-background/15 bg-background/10 text-background hover:bg-background/15",
+                  )}
+                  type="button"
+                  onClick={() => openEditor(routine)}
+                  aria-label={`Edit ${routine.name}`}
+                >
+                  <Pencil className="h-4 w-4" />
+                </button>
+                <button
+                  className={cn(
+                    "inline-flex h-9 w-9 items-center justify-center rounded-full border transition active:scale-95",
+                    selectedId === routine.id ? "border-border bg-surface-muted text-foreground" : "border-background/15 bg-background/10 text-background hover:bg-background/15",
+                  )}
+                  type="button"
+                  onClick={() => duplicateRoutine(routine.id)}
+                  aria-label={`Duplicate ${routine.name}`}
+                >
+                  <Copy className="h-4 w-4" />
+                </button>
+              </div>
+              <button className="w-full pr-24 text-left" onClick={() => selectRoutine(routine.id)} type="button">
+                <div className="min-w-0">
+                  <h3 className="break-words text-[21px] font-semibold leading-tight tracking-[-0.2px]">{routine.name}</h3>
                 </div>
                 <p className={cn("mt-4 text-sm", selectedId === routine.id ? "text-muted-foreground" : "text-background/70")}>
                   {routine.steps.length} steps - {formatMinutes(routineDuration(routine))} - {streaks[routine.id]?.current || 0}d streak
                 </p>
               </button>
-              <Button
-                className="mt-5 w-full"
-                variant={selectedId === routine.id ? "outline" : "secondary"}
-                size="sm"
-                type="button"
-                onClick={() => duplicateRoutine(routine.id)}
-              >
-                Duplicate
-              </Button>
             </div>
           ))}
         </div>
@@ -1160,13 +1209,76 @@ function RoutineGallery({ routines, selectedId, selectRoutine, duplicateRoutine,
   );
 }
 
-function ProgressSurface({ state, activeRoutine, level, routineCompletions, streak, latestCompletion, week, maxWeek, history }) {
+function ProgressSurface({ state, activeRoutine, level, routineCompletions, streak, latestCompletion, week, maxWeek, history, selectRoutine }) {
+  const [routineQuery, setRoutineQuery] = useState(activeRoutine?.name || "");
+  const [routineMenuOpen, setRoutineMenuOpen] = useState(false);
+  const filteredRoutines = state.routines.filter((routine) => routine.name.toLowerCase().includes(routineQuery.trim().toLowerCase()));
+  const routineOptions = filteredRoutines.length ? filteredRoutines : state.routines;
+
+  useEffect(() => {
+    setRoutineQuery(activeRoutine?.name || "");
+    setRoutineMenuOpen(false);
+  }, [activeRoutine?.id, activeRoutine?.name]);
+
+  function selectSearchedRoutine() {
+    const match = routineOptions[0];
+    if (match) {
+      selectRoutine(match.id, { openTimer: false });
+      setRoutineMenuOpen(false);
+    }
+  }
+
   return (
     <section id="progress" className="tile-compact bg-background">
       <div className="mx-auto max-w-[1440px]">
-        <div className="mb-8 text-center">
-          <h2 className="apple-tight text-[40px] font-semibold leading-tight">Progress, without the noise.</h2>
-          <p className="mx-auto mt-2 max-w-2xl text-[17px] leading-[1.47] tracking-normal text-foreground">XP, streak, history, and weekly pulse stay close to the timer so the reward loop is always visible.</p>
+        <div className="relative z-20 mb-5">
+          <div className="grid grid-cols-[minmax(0,1fr)_44px] overflow-hidden rounded-full border border-border bg-surface">
+            <input
+              className="min-h-11 min-w-0 bg-transparent px-4 text-base text-foreground outline-none placeholder:text-muted-foreground"
+              value={routineQuery}
+              onChange={(event) => {
+                setRoutineQuery(event.target.value);
+                setRoutineMenuOpen(true);
+              }}
+              onFocus={() => setRoutineMenuOpen(true)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter") selectSearchedRoutine();
+                if (event.key === "Escape") setRoutineMenuOpen(false);
+              }}
+              placeholder="Search routine"
+              aria-label="Search routine"
+            />
+            <button
+              className="grid h-full w-full place-items-center border-l border-border text-foreground"
+              type="button"
+              onClick={() => setRoutineMenuOpen((open) => !open)}
+              aria-label="Choose routine"
+              aria-expanded={routineMenuOpen}
+            >
+              <ChevronDown className="h-5 w-5" />
+            </button>
+          </div>
+          {routineMenuOpen ? (
+            <div className="absolute left-0 right-0 top-[calc(100%+8px)] z-30 max-h-56 overflow-y-auto rounded-lg border border-border bg-surface p-1 shadow-[0_18px_40px_rgba(0,0,0,0.38)]">
+              {routineOptions.map((routine) => (
+                <button
+                  className={cn(
+                    "flex min-h-11 w-full min-w-0 items-center justify-between gap-3 rounded-md px-3 text-left text-sm transition",
+                    activeRoutine?.id === routine.id ? "bg-primary text-primary-foreground" : "text-foreground hover:bg-surface-muted",
+                  )}
+                  key={routine.id}
+                  type="button"
+                  onClick={() => {
+                    selectRoutine(routine.id, { openTimer: false });
+                    setRoutineMenuOpen(false);
+                  }}
+                >
+                  <span className="min-w-0 truncate">{routine.name}</span>
+                  <span className="shrink-0 text-xs opacity-70">{routine.steps.length} steps</span>
+                </button>
+              ))}
+            </div>
+          ) : null}
         </div>
         <div className="grid gap-5 lg:grid-cols-[1fr_1.2fr_1fr]">
           <Card>
@@ -1362,9 +1474,9 @@ function EditorDialog({ open, setOpen, editingId, draft, setDraft, updateDraftSt
                     </div>
                   </div>
                   <label className="grid gap-1 text-xs font-medium text-muted-foreground">
-                    Type
-                    <select className="min-h-11 w-full min-w-0 rounded-sm border border-input bg-surface px-3 text-base text-foreground outline-none focus:ring-2 focus:ring-ring lg:text-sm" value={step.type} onChange={(event) => updateDraftStep(index, { type: event.target.value })} aria-label="Step type">
-                      {["prepare", "activity", "rest", "finish", "meditation", "yoga", "study", "custom"].map((type) => <option key={type} value={type}>{type}</option>)}
+                    Alarm
+                    <select className="min-h-11 w-full min-w-0 rounded-sm border border-input bg-surface px-3 text-base text-foreground outline-none focus:ring-2 focus:ring-ring lg:text-sm" value={step.chime || "beep"} onChange={(event) => updateDraftStep(index, { chime: event.target.value })} aria-label="Step alarm">
+                      {chimeOptions.map((option) => <option key={option.id} value={option.id}>{option.label}</option>)}
                     </select>
                   </label>
                 </div>
