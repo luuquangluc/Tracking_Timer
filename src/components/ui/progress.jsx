@@ -7,7 +7,7 @@ export function Progress({ value = 0, className, indicatorClassName, ...props })
 
   return (
     <div
-      className={cn("relative h-2.5 w-full overflow-hidden rounded-full bg-black/10", className)}
+      className={cn("relative h-2.5 w-full overflow-hidden rounded-control bg-surface-muted", className)}
       role="progressbar"
       aria-label={ariaLabel}
       aria-valuemin={0}
@@ -15,7 +15,7 @@ export function Progress({ value = 0, className, indicatorClassName, ...props })
       aria-valuenow={safeValue}
       {...props}
     >
-      <div className={cn("h-full rounded-full bg-primary transition-all duration-300", indicatorClassName)} style={{ width }} />
+      <div className={cn("h-full rounded-control bg-primary transition-all duration-300", indicatorClassName)} style={{ width }} />
     </div>
   );
 }

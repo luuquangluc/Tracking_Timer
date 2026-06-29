@@ -16,7 +16,7 @@ export function Dialog({ open, onOpenChange, title, description, children }) {
   return (
     <dialog
       ref={ref}
-      className="w-[min(760px,calc(100vw-28px))] rounded-lg border border-border bg-card p-0 text-card-foreground backdrop:bg-black/45"
+      className="w-[min(760px,calc(100vw-28px))] max-w-full overflow-hidden rounded-lg border border-border bg-surface p-0 text-card-foreground shadow-surface backdrop:bg-black/45"
       aria-labelledby={title ? titleId : undefined}
       aria-describedby={description ? descriptionId : undefined}
       onCancel={(event) => {
@@ -41,7 +41,7 @@ export function DialogHeader({ className, ...props }) {
 }
 
 export function DialogTitle({ className, ...props }) {
-  return <h2 className={cn("text-2xl font-semibold tracking-[-0.28px]", className)} {...props} />;
+  return <h2 className={cn("text-2xl font-semibold tracking-normal", className)} {...props} />;
 }
 
 export function DialogDescription({ className, ...props }) {

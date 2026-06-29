@@ -10,6 +10,10 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        surface: {
+          DEFAULT: "hsl(var(--surface))",
+          muted: "hsl(var(--surface-muted))",
+        },
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
@@ -30,13 +34,15 @@ export default {
       borderRadius: {
         lg: "18px",
         md: "11px",
-        sm: "8px",
+        sm: "var(--radius-card)",
+        control: "var(--radius-control)",
       },
       boxShadow: {
         product: "rgba(0, 0, 0, 0.22) 3px 5px 30px 0",
+        surface: "var(--shadow-surface)",
       },
       fontFamily: {
-        sans: ["system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "sans-serif"],
+        sans: ["-apple-system", "BlinkMacSystemFont", "SF Pro Display", "SF Pro Text", "Segoe UI", "system-ui", "sans-serif"],
       },
     },
   },
